@@ -1,3 +1,5 @@
+<html>
+<head>
 <!-- START SIGMA IMPORTS -->
 <script src="../src/sigma.core.js"></script>
 <script src="../src/conrad.js"></script>
@@ -54,49 +56,95 @@
 <script src="../plugins/sigma.parsers.json/sigma.parsers.json.js"></script>
 <script src = "https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.8.3/jquery.csv.js"></script>
+  <script data-require="d3@3.5.3" data-semver="3.5.3" src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.5.3/d3.js"></script>
+</head>
+
+<body>
+ <input type="file" onchange="loadFile()" />
 <div id="container">
+
   <style>
-    #graph-container {
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      position: absolute;
-    }
-	 .sigma-edge {
-      stroke: #14191C;
-    }
-    .sigma-node {
-      fill: green;
-      stroke: #14191C;
-      stroke-width: 2px;
-    }
-    .sigma-node:hover {
-      fill: blue;
-    }
-    .muted {
-      fill-opacity: 0.1;
-      stroke-opacity: 0.1;
-    }
+      #graph-container {
+		 margin:30px;
+		 height:50%;
+		 width:50%;
+		}
+		 .sigma-edge {
+		  stroke: #14191C;
+		}
+		.sigma-node {
+		  fill: green;
+		  stroke: #14191C;
+		  stroke-width: 2px;
+		}
+		.sigma-node:hover {
+		  fill: blue;
+		}
+		.muted {
+		  fill-opacity: 0.1;
+		  stroke-opacity: 0.1;
+		}
   </style>
   <div id="graph-container"></div>
 </div>
+
 <script>
 
 
  var data={};
+	// use the domain url of csvfile
+	 /*
+	$.ajax({
+	  url: 'Sample_Data.csv',
+	  dataType: 'text',
+	}).done(success);
+	function successFunction(data) {}
+	 */
+	 
+	 //local file input
+	var reader = new FileReader();  
+    
+    function loadFile() {      
+      var file = document.querySelector('input[type=file]').files[0];      
+      reader.addEventListener("load", parseFile, false);
+      if (file) {
+        reader.readAsText(file);
+      }      
+    }
+    
+    function parseFile(){
+      var doesColumnExist = false;
+      var data = d3.csv.parse(reader.result, function(d){
+        doesColumnExist = d.hasOwnProperty();
+        return d;   
+		console.log(d);
+      });
+   
+	  success(data);
+    }
  
- $.get('csv/Sample Data.csv', function(csvdata) {
-        // Split the lines
-        var lines = csvdata.split('\n');
+	function success(csvdata){
+
+		console.log(csvdata);
+	//return false;
+      // var lines = csvdata.split('\n');
+	  // var lines = csvdata.split(/\r?\n|\r/);console.log(lines);
 		var values=new Array();
+		values = csvdata;
 		var deep=0;
 		var points=new Array();
 		var k=0;
+		var root_count = 0;
+		/////
 		
-		for(var i=1;i<lines.length-1;i++){
-			values[i-1]=lines[i].split('\t');		
-			if(deep<values[i-1].length)deep=values[i-1].length;			
+		
+		
+		for(var i=0;i<values.length;i++){
+			values[i] = 
+				$.map(values[i], function(value, index) {
+					return [value];
+				});		
+			if(deep<values[i].length)deep=values[i].length;			
 		}
 				
 		
@@ -107,9 +155,11 @@
 			for(var j=0;j<values[i].length;j++){
 				if(!(values[i][j] in points)){
 					points[values[i][j]]=new Array();
-					var alpa=6.28*Math.random();
-					points[values[i][j]]['dx']=Math.pow(2,(deep-j))*Math.cos(alpa)/10;
-					points[values[i][j]]['dy']=Math.pow(2,(deep-j))*Math.sin(alpa)/10;
+					//
+					if(j==0){root_count++;var alpa=6.28/(root_count);}else{var alpa=6.28*Math.random();}
+					
+					points[values[i][j]]['dx']=Math.pow(2,(deep-j))*Math.cos(alpa)/100;
+					points[values[i][j]]['dy']=Math.pow(2,(deep-j))*Math.sin(alpa)/100;
 					
 					if(j>0){
 						data.nodes.push({
@@ -140,8 +190,6 @@
 		}
 		
 		
-		
-		
 		var k=0;
 		for(var i=0;i<values.length;i++){
 			for(var j=1;j<values[i].length;j++){
@@ -156,17 +204,9 @@
 			}
 		}
 		console.log(points);
-		/*
 		
-		s = new sigma({ 
-			graph: data,
-			container: 'graph-container',
-			settings: {
-				defaultNodeColor: '#ec5148'
-			}
-		});
-		*/
-		/*****/
+		
+		
 		  s = new sigma({
 		  graph: data,
 		  renderer: {
@@ -221,10 +261,8 @@
 		  });
 		});
 		
-		
-        //more code
+    }
 
-      });
  
 	function onGeneratedRow(columnsResult)
 	{
@@ -238,3 +276,5 @@
 	 }
 
 </script>
+</body>
+</html>
