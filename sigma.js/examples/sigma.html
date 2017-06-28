@@ -92,16 +92,7 @@
 
 
  var data={};
-	// use the domain url of csvfile
-	 /*
-	$.ajax({
-	  url: 'Sample_Data.csv',
-	  dataType: 'text',
-	}).done(success);
-	function successFunction(data) {}
-	 */
-	 
-	 //local file input
+	
 	var reader = new FileReader();  
     
     function loadFile() {      
@@ -126,18 +117,12 @@
 	function success(csvdata){
 
 		console.log(csvdata);
-	//return false;
-      // var lines = csvdata.split('\n');
-	  // var lines = csvdata.split(/\r?\n|\r/);console.log(lines);
 		var values=new Array();
 		values = csvdata;
 		var deep=0;
 		var points=new Array();
 		var k=0;
 		var root_count = 0;
-		/////
-		
-		
 		
 		for(var i=0;i<values.length;i++){
 			values[i] = 
